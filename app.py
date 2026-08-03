@@ -1,5 +1,4 @@
 import os
-import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -8,10 +7,12 @@ from supabase import create_client, Client
 app = Flask(__name__)
 CORS(app)
 
-# ===== KONEKSI SUPABASE =====
+# ===== AMBIL KREDENSIAL DARI ENVIRONMENT =====
 SUPABASE_URL = os.environ.get("https://exzpctjvnjksubmjqtfv.supabase.co")
 SUPABASE_KEY = os.environ.get("sb_publishable_eY3Lqocmx5GafVMGOmBdTg_BnqEiyiQ")
-supabase: Client = create_client(https://exzpctjvnjksubmjqtfv.supabase.co, sb_publishable_eY3Lqocmx5GafVMGOmBdTg_BnqEiyiQ)
+
+# ===== INISIALISASI SUPABASE CLIENT =====
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ===== REGISTER VICTIM =====
 @app.route('/api/register', methods=['POST'])
